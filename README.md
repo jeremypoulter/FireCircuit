@@ -7,3 +7,4 @@ Basically added the following;
 * Turn On/Off with the slide swich
 * Doubled up the animation to make it a bit more flickery 
 * Use the capacitive touch to change animation when touching the pumpkin (hopefully)
+* Turn off the animations if the light level is too high, or rather only turn the animation on in the dark
