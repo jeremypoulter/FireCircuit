@@ -16,17 +16,17 @@ void setup() {
 uint8_t prev[] = {128, 128};              // Start brightness in middle
 float lightLevel = 100;
 
-#define LIGHT_ON_INFLUANCE 0.05
+#define LIGHT_ON_INFLUANCE  0.05
 #define LIGHT_OFF_THRESHOLD 300
 #define LIGHT_ON_THRESHOLD  200
-#define LIGHT_UPDATE_TIME (1000/10)
+#define LIGHT_UPDATE_TIME   (1000/10)
 
 bool displayOn = false;
-long lightReadTimeout = 0;
+uint32_t lightReadTimeout = 0;
 
-long displayOffTimeOut = 0;
-#define DISPLAY_TIME_ON (5 * 60 * 60 * 1000)
-//#define DISPLAY_TIME_ON (10 * 1000)
+uint32_t displayOffTimeOut = 0;
+#define DISPLAY_TIME_ON (5L * 60L * 60L * 1000L)
+//#define DISPLAY_TIME_ON (10L * 1000L)
 
 void loop() 
 {
@@ -34,8 +34,6 @@ void loop()
   
   if(CircuitPlayground.slideSwitch())
   {
-    digitalWrite(ON_LED, HIGH);
-
     if(millis() >= lightReadTimeout) 
     {
       int value = CircuitPlayground.lightSensor();
@@ -43,9 +41,9 @@ void loop()
                     (float)lightLevel * (1-LIGHT_ON_INFLUANCE) + (float)value * LIGHT_ON_INFLUANCE : (float)value;
       
       //Serial.print("Light Sensor: ");
-      Serial.print(value);
-      Serial.print(", ");
-      Serial.println(lightLevel);
+      //Serial.print(value);
+      //Serial.print(", ");
+      //Serial.println(lightLevel);
       lightReadTimeout = millis() + LIGHT_UPDATE_TIME;
     }
 
@@ -56,13 +54,18 @@ void loop()
       {
         // Turning the animations on start the timer
         displayOffTimeOut = millis() + DISPLAY_TIME_ON;
+        //Serial.print(millis());
+        //Serial.print(", ");
+        //Serial.print(DISPLAY_TIME_ON);
+        //Serial.print(", ");
+        //Serial.println(displayOffTimeOut);
         displayOn = true;
       }
 
       if(millis() < displayOffTimeOut)
       {
         int cap = CircuitPlayground.readCap(0, CAP_SAMPLES);
-        Serial.println(cap);
+        //Serial.println(cap);
         if(cap >= CAP_THRESHOLD) 
         {
           uint32_t offset = millis() / 5;
@@ -84,13 +87,13 @@ void loop()
         }
       } else {
         sleep = true;
+        status(1);
       }
     } else {
       displayOn = false;
       sleep = true;
+      status(lightLevel / 100);
     }
-
-    digitalWrite(ON_LED, LOW);
   }
   else
   {
@@ -105,6 +108,19 @@ void loop()
     CircuitPlayground.strip.show();
     Watchdog.sleep(1000);
 //    delay(1000);
+  }
+}
+
+void status(int i) 
+{
+  for(; i > 0; i--) 
+  {
+    digitalWrite(ON_LED, HIGH);
+    delay(50);
+    digitalWrite(ON_LED, LOW);
+    if(i > 1) {
+      delay(150);
+    }
   }
 }
 
